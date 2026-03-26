@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Vik's Kanji (N5)</title>
+<meta name="description" content="Free N5 kanji flashcard game with SRS, quiz, and match modes. 118 kanji.">
+<meta name="theme-color" content="#c0392b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Vik's Kanji">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg1:#ffffff;--bg2:#f5f5f5;--txt1:#1a1a1a;--txt2:#6b6b6b;--txt3:#9b9b9b;
+  --brd1:rgba(0,0,0,0.4);--brd2:rgba(0,0,0,0.25);--brd3:rgba(0,0,0,0.12);
+  --bg-info:#e6f1fb;--txt-info:#185fa5;--brd-info:#378add;
+  --bg-ok:#eaf3de;--txt-ok:#3b6d11;--brd-ok:#639922;
+  --bg-err:#fcebeb;--txt-err:#a32d2d;--brd-err:#e24b4a;
+  --bg-warn:#faeeda;--txt-warn:#854f0b;--brd-warn:#ef9f27;
+  --rad:8px;--radlg:12px;--font:system-ui,-apple-system,sans-serif;
+  --cat-numbers:#f0e8ff;--cat-numbers-brd:#9b72cf;
+  --cat-time:#e8f0ff;--cat-time-brd:#6b8cde;
+  --cat-people:#fff0e8;--cat-people-brd:#de8b6b;
+  --cat-nature:#e8f5e8;--cat-nature-brd:#5faa6b;
+  --cat-actions:#fff5e8;--cat-actions-brd:#d4952a;
+  --cat-places:#e8f8ff;--cat-places-brd:#5aaacc;
+  --cat-adjectives:#ffeef0;--cat-adjectives-brd:#cc7080;
+  --cat-body:#fce8f0;--cat-body-brd:#cc6699;
+  --cat-directions:#e8fff5;--cat-directions-brd:#2aaa80;
+  --cat-question:#f5f0e8;--cat-question-brd:#aa8030;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg1:#1e1e1e;--bg2:#2a2a2a;--txt1:#f0f0f0;--txt2:#a0a0a0;--txt3:#6a6a6a;
+  --brd1:rgba(255,255,255,0.4);--brd2:rgba(255,255,255,0.25);--brd3:rgba(255,255,255,0.12);
+  --bg-info:#0c3a6b;--txt-info:#85b7eb;--brd-info:#378add;
+  --bg-ok:#1a3a0a;--txt-ok:#97c459;--brd-ok:#639922;
+  --bg-err:#3a1010;--txt-err:#f09595;--brd-err:#e24b4a;
+  --bg-warn:#3a2000;--txt-warn:#fac775;--brd-warn:#ef9f27;
+  --cat-numbers:#2a1f40;--cat-numbers-brd:#9b72cf;
+  --cat-time:#1a2040;--cat-time-brd:#6b8cde;
+  --cat-people:#40271a;--cat-people-brd:#de8b6b;
+  --cat-nature:#1a3020;--cat-nature-brd:#5faa6b;
+  --cat-actions:#402810;--cat-actions-brd:#d4952a;
+  --cat-places:#1a3040;--cat-places-brd:#5aaacc;
+  --cat-adjectives:#401520;--cat-adjectives-brd:#cc7080;
+  --cat-body:#401030;--cat-body-brd:#cc6699;
+  --cat-directions:#103028;--cat-directions-brd:#2aaa80;
+  --cat-question:#30280a;--cat-question-brd:#aa8030;
+}}
+body{font-family:var(--font);color:var(--txt1);background:var(--bg2);min-height:100vh;padding:1rem}
+.app{max-width:720px;margin:0 auto;padding:.5rem 0}
+
+/* header */
+.header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:8px}
+.brand{display:flex;flex-direction:column;gap:2px}
+.brand-title{font-size:18px;font-weight:500}
+.brand-sub{font-size:12px;color:var(--txt3)}
+.mode-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{padding:5px 13px;border-radius:var(--rad);border:.5px solid var(--brd2);background:transparent;color:var(--txt2);font-size:13px;cursor:pointer;transition:all .15s}
+.tab.active{background:var(--txt1);color:var(--bg1);border-color:var(--txt1)}
+.tab:hover:not(.active){background:var(--bg2)}
+
+/* filter */
+.filter-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:.9rem;align-items:center}
+.filter-label{font-size:12px;color:var(--txt2)}
+.filter-btn{padding:3px 10px;border-radius:var(--rad);border:.5px solid var(--brd3);background:transparent;color:var(--txt2);font-size:12px;cursor:pointer;transition:all .15s}
+.filter-btn.on{background:var(--bg2);color:var(--txt1);border-color:var(--brd1)}
+
+/* stats */
+.stats-row{display:flex;gap:8px;margin-bottom:.9rem;flex-wrap:wrap}
+.stat{background:var(--bg2);border-radius:var(--rad);padding:8px 14px;min-width:68px;text-align:center}
+.stat-n{font-size:20px;font-weight:500}
+.stat-l{font-size:11px;color:var(--txt2);margin-top:1px}
+.stat.good .stat-n{color:var(--txt-ok)}
+.stat.bad  .stat-n{color:var(--txt-err)}
+
+/* deck filter row */
+.deck-filter-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:.7rem;align-items:center}
+
+/* kanji mosaic */
+.kanji-mosaic{display:flex;flex-wrap:wrap;gap:8px;margin-top:.4rem}
+.km-tile{width:112px;border-radius:var(--rad);border:2px solid var(--brd3);background:var(--bg1);
+  padding:10px 8px;text-align:center;cursor:pointer;user-select:none;transition:box-shadow .15s,transform .1s;flex-shrink:0}
+.km-tile:active{transform:scale(.96)}
+.km-tile[data-cat="numbers"]{background:var(--cat-numbers);border-color:var(--cat-numbers-brd)}
+.km-tile[data-cat="time"]{background:var(--cat-time);border-color:var(--cat-time-brd)}
+.km-tile[data-cat="people"]{background:var(--cat-people);border-color:var(--cat-people-brd)}
+.km-tile[data-cat="nature"]{background:var(--cat-nature);border-color:var(--cat-nature-brd)}
+.km-tile[data-cat="actions"]{background:var(--cat-actions);border-color:var(--cat-actions-brd)}
+.km-tile[data-cat="places"]{background:var(--cat-places);border-color:var(--cat-places-brd)}
+.km-tile[data-cat="adjectives"]{background:var(--cat-adjectives);border-color:var(--cat-adjectives-brd)}
+.km-tile[data-cat="body"]{background:var(--cat-body);border-color:var(--cat-body-brd)}
+.km-tile[data-cat="directions"]{background:var(--cat-directions);border-color:var(--cat-directions-brd)}
+.km-tile[data-cat="question"]{background:var(--cat-question);border-color:var(--cat-question-brd)}
+.km-tile.status-known{outline:3px solid var(--brd-ok)}
+.km-tile.status-learning{outline:3px solid var(--brd-err)}
+.km-k{font-size:32px;display:block;margin-bottom:4px;line-height:1}
+.km-mean{font-size:11px;font-weight:500;color:var(--txt1);display:block;margin-bottom:3px}
+.km-read{font-size:10px;color:var(--txt2);display:block;line-height:1.5}
+.km-badge{font-size:9px;margin-top:4px;display:inline-block;padding:2px 6px;border-radius:4px}
+.km-badge.b-known{background:var(--bg-ok);color:var(--txt-ok)}
+.km-badge.b-learning{background:var(--bg-err);color:var(--txt-err)}
+
+
+/* SRS */
+.srs-interval{font-size:11px;color:var(--txt3);display:block;margin-top:3px}
+
+/* slider */
+.slider-wrap{padding:0 2px}
+
+/* custom kanji select */
+.custom-select-grid{display:flex;flex-wrap:wrap;gap:6px;padding:.8rem;background:var(--bg1);
+  border-radius:var(--rad);border:.5px solid var(--brd3);margin-bottom:.6rem;max-height:200px;overflow-y:auto}
+.csg-tile{width:48px;height:48px;border-radius:var(--rad);border:.5px solid var(--brd2);background:var(--bg2);
+  display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;transition:all .13s;user-select:none}
+.csg-tile.selected{background:var(--txt1);color:var(--bg1);border-color:var(--txt1)}
+.csg-tile.status-known{border-color:var(--brd-ok);background:var(--bg-ok)}
+.csg-tile.status-learning{border-color:var(--brd-err)}
+#custom-panel{display:none}
+
+/* site header */
+.site-header{text-align:center;padding:.6rem 0 1rem}
+.site-name{font-size:13px;color:var(--txt3);text-decoration:none;letter-spacing:.04em;border-bottom:.5px solid var(--brd3);padding-bottom:1px;transition:color .15s}
+.site-name:hover{color:var(--txt2)}
+/* progress */
+.progress-wrap{margin-bottom:1.25rem}
+.progress-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.progress-lbl{font-size:11px;color:var(--txt3)}
+.progress-pct{font-size:11px;color:var(--txt3);font-weight:500}
+.progress-bar{height:4px;background:var(--brd3);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:var(--txt1);border-radius:2px;transition:width .3s}
+
+/* card */
+.card-wrap{perspective:1000px;margin-bottom:.9rem}
+.card{width:100%;min-height:280px;position:relative;transform-style:preserve-3d;transition:transform .42s cubic-bezier(.4,0,.2,1);cursor:pointer}
+.card.flipped{transform:rotateX(180deg)}
+.card-face{position:absolute;width:100%;min-height:280px;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:var(--radlg);border:.5px solid var(--brd3);background:var(--bg1);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.75rem 1.5rem}
+.card-back{transform:rotateX(180deg)}
+.tap-hint{font-size:12px;color:var(--txt3);position:absolute;bottom:13px;left:0;right:0;text-align:center}
+.kanji-big{font-size:96px;line-height:1;margin-bottom:.4rem}
+.card-cat{font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem}
+.back-kanji{font-size:54px;line-height:1;margin-bottom:.6rem}
+.back-emoji{font-size:28px;margin-bottom:.4rem}
+.meaning{font-size:22px;font-weight:500;margin-bottom:.4rem;text-align:center}
+.readings{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;margin-bottom:.6rem}
+.pill{padding:4px 12px;border-radius:var(--rad);font-size:13px;border:.5px solid var(--brd2)}
+.pill-on{background:var(--bg-info);color:var(--txt-info);border-color:var(--brd-info)}
+.pill-kun{background:var(--bg-ok);color:var(--txt-ok);border-color:var(--brd-ok)}
+.pill-lbl{font-size:10px;color:var(--txt3);text-align:center;margin-bottom:4px}
+.examples{font-size:12px;color:var(--txt2);text-align:center;line-height:1.9}
+.ex-meaning{font-size:11px;color:var(--txt3);text-align:center;margin-top:3px;line-height:1.7;font-style:italic}
+
+/* buttons */
+.actions{display:flex;gap:8px;justify-content:center;margin-bottom:.9rem}
+.btn{padding:8px 20px;border-radius:var(--rad);border:.5px solid var(--brd2);background:transparent;color:var(--txt1);font-size:14px;cursor:pointer;transition:all .15s}
+.btn:hover{background:var(--bg2)}
+.btn.primary{background:var(--txt1);color:var(--bg1);border-color:var(--txt1)}
+.btn.ok   {background:var(--bg-ok);color:var(--txt-ok);border-color:var(--brd-ok)}
+.btn.err  {background:var(--bg-err);color:var(--txt-err);border-color:var(--brd-err)}
+.nav-row{display:flex;gap:8px;justify-content:center;align-items:center}
+.nav-btn{width:36px;height:36px;border-radius:var(--rad);border:.5px solid var(--brd2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--txt1)}
+.nav-btn:hover{background:var(--bg2)}
+.nav-pos{font-size:13px;color:var(--txt2);min-width:80px;text-align:center}
+
+/* settings row */
+.settings-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:.9rem;padding:10px 14px;background:var(--bg1);border-radius:var(--rad);border:.5px solid var(--brd3)}
+.settings-row label{font-size:13px;color:var(--txt2)}
+.settings-row input[type=number]{width:64px;padding:4px 8px;border-radius:var(--rad);border:.5px solid var(--brd2);background:transparent;color:var(--txt1);font-size:13px}
+.quiz-type-badge{font-size:12px;padding:3px 10px;border-radius:var(--rad);background:var(--bg-warn);color:var(--txt-warn);border:.5px solid var(--brd-warn)}
+
+/* checklist */
+#quiz-start-btn:disabled{opacity:.35;cursor:not-allowed;pointer-events:none}
+.checklist-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px}
+.chk-item{display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:var(--rad);border:.5px solid var(--brd3);background:var(--bg1);font-size:13px;cursor:pointer;transition:background .13s;user-select:none}
+.chk-item:hover{background:var(--bg2)}
+.chk-item input[type=checkbox]{width:15px;height:15px;cursor:pointer;accent-color:var(--txt1);flex-shrink:0}
+/* quiz */
+.panel{background:var(--bg1);border:.5px solid var(--brd3);border-radius:var(--radlg);padding:1.5rem;margin-bottom:.9rem}
+.quiz-prompt{font-size:13px;color:var(--txt2);margin-top:.4rem}
+.quiz-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:.9rem}
+.opt-btn{padding:11px 14px;border-radius:var(--rad);border:.5px solid var(--brd2);background:var(--bg1);cursor:pointer;font-size:14px;text-align:left;transition:all .15s;color:var(--txt1);line-height:1.4}
+.opt-btn:hover:not([disabled]){background:var(--bg2)}
+.opt-btn.correct{background:var(--bg-ok);border-color:var(--brd-ok);color:var(--txt-ok)}
+.opt-btn.wrong{background:var(--bg-err);border-color:var(--brd-err);color:var(--txt-err)}
+.opt-kanji{font-size:26px;display:block;margin-bottom:3px}
+.quiz-prog{font-size:12px;color:var(--txt3);margin-top:.5rem;text-align:center}
+
+/* match */
+.match-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:.9rem}
+.match-col{display:flex;flex-direction:column;gap:6px}
+.match-item{padding:10px 13px;border-radius:var(--rad);border:.5px solid var(--brd2);background:var(--bg1);cursor:pointer;font-size:14px;transition:background .4s, border-color .4s, color .4s;text-align:center;color:var(--txt1)}
+.match-item:hover:not(.matched):not(.selected){background:var(--bg2)}
+.match-item.selected{border-color:var(--brd1);background:var(--bg2)}
+.match-item.matched{background:var(--bg-ok);border-color:var(--brd-ok);color:var(--txt-ok);pointer-events:none}
+.match-item.wrong{background:var(--bg-err);border-color:var(--brd-err);color:var(--txt-err)}
+.match-kanji{font-size:28px}
+
+/* result */
+.result-screen{text-align:center;padding:2.5rem 1rem}
+.result-big{font-size:52px;font-weight:500;margin-bottom:.4rem}
+.result-grid{display:flex;gap:12px;justify-content:center;margin:1rem 0 1.5rem}
+
+/* description */
+.description-strip{margin-top:1.5rem;padding:1rem 1.25rem;background:var(--bg1);border:.5px solid var(--brd3);border-radius:var(--radlg);line-height:1.8}
+.description-strip p{font-size:13px;color:var(--txt2);margin-bottom:.4rem}
+.description-strip p:last-child{margin-bottom:0}
+.description-strip a{color:var(--txt-info);text-decoration:none}
+.level-link{display:inline-block;padding:4px 12px;border-radius:var(--rad);border:.5px solid var(--brd2);background:var(--bg2);color:var(--txt2);font-size:12px;cursor:not-allowed;opacity:.7}
+.description-strip a:hover{text-decoration:underline}
+/* donate */
+.donate-strip{margin-top:2rem;padding:1rem 1.25rem;background:var(--bg1);border:.5px solid var(--brd3);border-radius:var(--radlg);text-align:center}
+.donate-strip h3{font-size:15px;font-weight:500;margin-bottom:.3rem}
+.donate-strip p{font-size:13px;color:var(--txt2);margin-bottom:.8rem;line-height:1.6}
+.donate-btn{display:inline-block;padding:9px 22px;background:#0070ba;color:#fff;border-radius:var(--rad);font-size:14px;font-weight:500;text-decoration:none;border:none;cursor:pointer;transition:opacity .15s}
+.donate-btn:hover{opacity:.85}
+
+/* footer */
+.footer{margin-top:1.5rem;text-align:center;font-size:11px;color:var(--txt3);line-height:1.8}
+
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="site-header">
+    <a class="site-name" href="https://vikwebs.n5-kanji.com" target="_blank" rel="noopener">vikwebs.n5-kanji.com</a>
+  </div>
+
+  <div class="header">
+    <div class="brand">
+      <div class="brand-title">🇯🇵 Vik's Kanji (N5)</div>
+      <div class="brand-sub" id="deck-info">118 kanji · All categories</div>
+    </div>
+    <div class="mode-tabs">
+      <button class="tab active" onclick="setMode('flash',this)">Flashcards</button>
+      <button class="tab" onclick="setMode('quiz',this)">Quiz</button>
+      <button class="tab" onclick="setMode('match',this)">Match</button>
+      <button class="tab" onclick="setMode('srs',this)">SRS</button>
+      <button class="tab" onclick="setMode('list',this)">All Kanji</button>
+    </div>
+  </div>
+
+  <div class="filter-row" id="cat-filter-row">
+    <span class="filter-label">Category:</span>
+    <button class="filter-btn on" onclick="setFilter('all',this)">All</button>
+    <button class="filter-btn" onclick="setFilter('numbers',this)">Numbers</button>
+    <button class="filter-btn" onclick="setFilter('time',this)">Time</button>
+    <button class="filter-btn" onclick="setFilter('people',this)">People</button>
+    <button class="filter-btn" onclick="setFilter('body',this)">Body</button>
+    <button class="filter-btn" onclick="setFilter('nature',this)">Nature</button>
+    <button class="filter-btn" onclick="setFilter('actions',this)">Actions</button>
+    <button class="filter-btn" onclick="setFilter('adjectives',this)">Adjectives</button>
+    <button class="filter-btn" onclick="setFilter('directions',this)">Directions</button>
+    <button class="filter-btn" onclick="setFilter('places',this)">Places</button>
+    <button class="filter-btn" onclick="setFilter('question',this)">Question</button>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat"><div class="stat-n" id="s-total">0</div><div class="stat-l">deck</div></div>
+    <div class="stat good"><div class="stat-n" id="s-know">0</div><div class="stat-l">known</div></div>
+    <div class="stat bad"><div class="stat-n" id="s-learn">0</div><div class="stat-l">learning</div></div>
+    <div class="stat"><div class="stat-n" id="s-streak">0</div><div class="stat-l">streak</div></div>
+  </div>
+
+  <div class="deck-filter-row" id="deck-filter-row">
+    <span class="filter-label">Study set:</span>
+    <button class="filter-btn on" id="ds-all"    onclick="setDeckFilter('all',this)">All (118)</button>
+    <button class="filter-btn"   id="ds-learn"   onclick="setDeckFilter('learning',this)">Still learning (0)</button>
+    <button class="filter-btn"   id="ds-known"   onclick="setDeckFilter('known',this)">Got it (0)</button>
+    <button class="filter-btn"   id="ds-custom"  onclick="setDeckFilter('custom',this)">Custom</button>
+  </div>
+
+  <div id="custom-panel">
+    <div style="font-size:12px;color:var(--txt2);margin-bottom:6px">
+      Tap kanji to include in your custom deck:
+      <button class="btn" style="padding:2px 10px;font-size:12px;float:right" onclick="applyCustom()">Apply</button>
+    </div>
+    <div class="custom-select-grid" id="csg"></div>
+  </div>
+
+  <div class="progress-wrap" id="progress-wrap">
+    <div class="progress-meta">
+      <span class="progress-lbl" id="prog-label">Card 1 of 100</span>
+      <span class="progress-pct" id="prog-pct">1%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="prog" style="width:0%"></div></div>
+  </div>
+
+  <!-- ── FLASHCARD MODE ── -->
+  <div id="flash-mode">
+    <div class="card-wrap">
+      <div class="card" id="card" onclick="flipCard()">
+        <div class="card-face card-front">
+          <div class="card-cat" id="front-cat"></div>
+          <div class="kanji-big" id="front-kanji"></div>
+          <div class="tap-hint">tap to reveal</div>
+        </div>
+        <div class="card-face card-back">
+          <div class="back-emoji" id="back-emoji"></div>
+          <div class="back-kanji" id="back-kanji"></div>
+          <div class="meaning" id="back-meaning"></div>
+          <div class="pill-lbl">readings</div>
+          <div class="readings" id="back-readings"></div>
+          <div class="examples" id="back-examples"></div>
+          <div class="ex-meaning" id="back-ex-meaning"></div>
+        </div>
+      </div>
+    </div>
+    <div class="actions" id="rate-btns" style="display:none">
+      <button class="btn" onclick="rate(false)">Still learning</button>
+      <button class="btn" onclick="rate(true)">Got it!</button>
+    </div>
+    <div class="nav-row">
+      <button class="nav-btn" onclick="prev()">&#8592;</button>
+      <div class="nav-pos" id="nav-pos">1 / 100</div>
+      <button class="nav-btn" onclick="next()">&#8594;</button>
+      <button class="btn" id="shuffle-btn" style="margin-left:8px" onclick="toggleShuffle()">Shuffle</button>
+    </div>
+    <div class="slider-wrap" id="slider-wrap">
+      <input type="range" id="card-slider" min="0" max="99" value="0"
+             oninput="sliderNav(this.value)" style="width:100%;margin-top:.6rem">
+    </div>
+  </div>
+
+  <!-- ── QUIZ MODE ── -->
+  <div id="quiz-mode" class="hidden">
+    <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:10px">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <label for="quiz-count">Questions per session:</label>
+        <input type="number" id="quiz-count" value="10" min="1" max="100">
+        <button class="btn" id="quiz-start-btn" onclick="startQuiz()">Start</button>
+        <span class="quiz-type-badge" id="quiz-type-badge"></span>
+      </div>
+      <div style="width:100%">
+        <div style="font-size:13px;color:var(--txt2);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
+          <span>Quiz types <span style="color:var(--txt3)">(select one or more)</span></span>
+          <span style="display:flex;gap:6px">
+            <button class="btn" style="padding:3px 10px;font-size:12px" onclick="checkAll()">All</button>
+            <button class="btn" style="padding:3px 10px;font-size:12px" onclick="checkNone()">None</button>
+          </span>
+        </div>
+        <div class="checklist-grid" id="quiz-type-checklist">
+          <label class="chk-item"><input type="checkbox" value="0" checked> Kanji → Meaning</label>
+          <label class="chk-item"><input type="checkbox" value="2" checked> Meaning → Kanji</label>
+          <label class="chk-item"><input type="checkbox" value="rk" checked> Readings → Kanji</label>
+          <label class="chk-item"><input type="checkbox" value="kr" checked> Kanji → Readings</label>
+          <label class="chk-item"><input type="checkbox" value="3on"> ON reading → Kanji</label>
+          <label class="chk-item"><input type="checkbox" value="1on"> Kanji → ON reading</label>
+          <label class="chk-item"><input type="checkbox" value="3kun"> KUN reading → Kanji</label>
+          <label class="chk-item"><input type="checkbox" value="1kun"> Kanji → KUN reading</label>
+        </div>
+      </div>
+    </div>
+    <div id="quiz-game" class="hidden">
+      <div class="panel" style="text-align:center">
+        <div class="card-cat" id="q-cat"></div>
+        <div id="q-stimulus" style="font-size:76px;line-height:1;margin:.3rem 0 .4rem"></div>
+        <div class="quiz-prompt" id="q-prompt"></div>
+        <div class="quiz-opts" id="q-opts"></div>
+        <div class="quiz-prog" id="q-prog"></div>
+      </div>
+      <div style="text-align:center;margin-bottom:.9rem">
+        <button class="btn" onclick="skipQuiz()">Skip</button>
+        <button class="btn" style="margin-left:6px" onclick="endQuiz()">End session</button>
+      </div>
+    </div>
+    <div id="quiz-start-hint" style="text-align:center;padding:2rem;font-size:14px;color:var(--txt2)">
+      Set the number of questions above and press Start.
+    </div>
+  </div>
+
+  <!-- ── MATCH MODE ── -->
+  <div id="match-mode" class="hidden">
+    <div class="settings-row">
+      <label for="match-count">Pairs per round:</label>
+      <input type="number" id="match-count" value="6" min="2" max="10">
+      <button class="btn" onclick="newMatchRound()">New round</button>
+    </div>
+    <div id="match-game">
+      <div class="panel">
+        <div style="font-size:13px;color:var(--txt2);margin-bottom:.5rem;text-align:center">Match each kanji to its meaning</div>
+        <div class="match-grid">
+          <div class="match-col" id="match-kanji-col"></div>
+          <div class="match-col" id="match-mean-col"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SRS MODE ── -->
+  <div id="srs-mode" class="hidden">
+    <div class="panel" style="text-align:center;padding:1.2rem 1rem .8rem">
+      <div style="font-size:12px;color:var(--txt3);margin-bottom:.4rem" id="srs-queue-info"></div>
+      <div style="font-size:11px;color:var(--txt3)" id="srs-next-info"></div>
+    </div>
+    <div class="card-wrap">
+      <div class="card" id="srs-card" onclick="flipSRS()">
+        <div class="card-face card-front">
+          <div class="card-cat" id="srs-front-cat"></div>
+          <div class="kanji-big" id="srs-front-kanji"></div>
+          <div class="tap-hint">tap to reveal</div>
+        </div>
+        <div class="card-face card-back">
+          <div class="back-emoji" id="srs-back-emoji"></div>
+          <div class="back-kanji" id="srs-back-kanji"></div>
+          <div class="meaning" id="srs-back-meaning"></div>
+          <div class="pill-lbl">readings</div>
+          <div class="readings" id="srs-back-readings"></div>
+          <div class="examples" id="srs-back-examples"></div>
+          <div class="ex-meaning" id="srs-back-exm"></div>
+        </div>
+      </div>
+    </div>
+    <div class="actions" id="srs-rate-btns" style="display:none">
+      <button class="btn err"  onclick="rateSRS(1)">Again</button>
+      <button class="btn"      onclick="rateSRS(2)">Hard</button>
+      <button class="btn ok"   onclick="rateSRS(3)">Good</button>
+      <button class="btn primary" onclick="rateSRS(4)">Easy</button>
+    </div>
+    <div id="srs-done" class="hidden" style="text-align:center;padding:2rem;color:var(--txt2);font-size:14px">
+      Session complete! Come back later to review due cards.
+      <br><button class="btn primary" style="margin-top:1rem" onclick="startSRS()">Restart session</button>
+    </div>
+  </div>
+
+  <!-- ── LIST MODE ── -->
+  <div id="list-mode" class="hidden">
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:.5rem">
+      <span class="filter-btn on" id="list-view-all"         onclick="setListView('all',this)">All</span>
+      <span class="filter-btn"    id="list-view-numbers"    onclick="setListView('numbers',this)">Numbers</span>
+      <span class="filter-btn"    id="list-view-time"       onclick="setListView('time',this)">Time</span>
+      <span class="filter-btn"    id="list-view-people"     onclick="setListView('people',this)">People</span>
+      <span class="filter-btn"    id="list-view-body"       onclick="setListView('body',this)">Body</span>
+      <span class="filter-btn"    id="list-view-nature"     onclick="setListView('nature',this)">Nature</span>
+      <span class="filter-btn"    id="list-view-actions"    onclick="setListView('actions',this)">Actions</span>
+      <span class="filter-btn"    id="list-view-adjectives" onclick="setListView('adjectives',this)">Adjectives</span>
+      <span class="filter-btn"    id="list-view-directions" onclick="setListView('directions',this)">Directions</span>
+      <span class="filter-btn"    id="list-view-places"     onclick="setListView('places',this)">Places</span>
+      <span class="filter-btn"    id="list-view-question"   onclick="setListView('question',this)">Question</span>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:.8rem">
+      <span class="filter-btn on" id="list-status-all"   onclick="setListStatus('all',this)">All statuses</span>
+      <span class="filter-btn"    id="list-status-neutral" onclick="setListStatus('neutral',this)">Neutral</span>
+      <span class="filter-btn"    id="list-status-learn" onclick="setListStatus('learning',this)">Still learning</span>
+      <span class="filter-btn"    id="list-status-known" onclick="setListStatus('known',this)">Got it</span>
+    </div>
+    <div style="font-size:11px;color:var(--txt3);margin-bottom:.8rem">
+      Double-tap a kanji to cycle: neutral → still learning → got it → neutral
+    </div>
+    <div class="kanji-mosaic" id="kanji-mosaic"></div>
+  </div>
+
+  <!-- ── RESULT SCREEN ── -->
+  <div id="result-screen" class="hidden result-screen">
+    <div class="result-big" id="res-emoji"></div>
+    <div style="font-size:22px;font-weight:500;margin-bottom:.4rem" id="res-title"></div>
+    <div style="font-size:15px;color:var(--txt2);margin-bottom:.2rem" id="res-sub"></div>
+    <div class="result-grid" id="res-stats"></div>
+    <button class="btn primary" onclick="restartDeck()">Restart deck</button>
+    <button class="btn" style="margin-left:8px" onclick="reviewWeak()">Review weak kanji</button>
+  </div>
+
+  <!-- ── DESCRIPTION ── -->
+  <div class="description-strip">
+    <p>This N5 kanji game was made with the intention of helping you learn the N5 kanji in a fun and efficient way.</p>
+    <p style="margin-top:.6rem;font-weight:500;font-size:13px;color:var(--txt1)">More kanji levels:</p>
+    <p style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:.2rem">
+      <a href="#" class="level-link">N4 Kanji</a>
+      <a href="#" class="level-link">N3 Kanji</a>
+      <a href="#" class="level-link">N2 Kanji</a>
+      <a href="#" class="level-link">N1 Kanji</a>
+      <a href="#" class="level-link">All Jōyō Kanji</a>
+    </p>
+    <p>Check out more of my content at <a href="https://vikwebs.com" target="_blank" rel="noopener">vikwebs.com</a></p>
+    <p>You can contact me through my email: <a href="mailto:vikwebsadmin@gmail.com">vikwebsadmin@gmail.com</a></p>
+    <p>If you can, please consider supporting me so I can make more content and continue to improve my current work.</p>
+  </div>
+
+  <!-- ── DONATE ── -->
+  <div class="donate-strip">
+    <h3>Support The Project 🥺</h3>
+    <p>If this game has helped you on your Japanese learning journey, consider leaving a small donation — it goes a long way towards keeping this free and building more tools like it!</p>
+    <a class="donate-btn" href="https://www.paypal.com/donate" target="_blank" rel="noopener">Donate via PayPal</a>
+  </div>
+
+  <div class="footer">
+    Made with &#10084; by <strong>Víctor Fernández Bravo Ahuja</strong> &nbsp;·&nbsp; Vik's Kanji (N5) &nbsp;·&nbsp; 118 kanji
+  </div>
+
+  <!-- ── LOGIN MODAL ── -->
+  <div id="login-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.55);z-index:1000;align-items:center;justify-content:center">
+    <div style="background:var(--bg1);border-radius:var(--radlg);border:.5px solid var(--brd2);padding:2rem;width:90%;max-width:380px;text-align:center">
+      <div style="font-size:22px;margin-bottom:.3rem">🇯🇵</div>
+      <div style="font-size:17px;font-weight:500;margin-bottom:.2rem">Vik's Kanji (N5)</div>
+      <div style="font-size:12px;color:var(--txt3);margin-bottom:1.5rem">Sign in to sync your progress across devices</div>
+      <div id="login-form">
+        <input type="email" id="login-email" placeholder="Email" style="width:100%;margin-bottom:8px;padding:9px 12px;border-radius:var(--rad);border:.5px solid var(--brd2);background:var(--bg2);color:var(--txt1);font-size:14px">
+        <input type="password" id="login-pass" placeholder="Password" style="width:100%;margin-bottom:12px;padding:9px 12px;border-radius:var(--rad);border:.5px solid var(--brd2);background:var(--bg2);color:var(--txt1);font-size:14px">
+        <button class="btn primary" style="width:100%;margin-bottom:8px" onclick="doLogin()">Sign in</button>
+        <button class="btn" style="width:100%;margin-bottom:12px" onclick="showRegister()">Create account</button>
+        <button class="btn" style="width:100%;font-size:12px;color:var(--txt3)" onclick="continueGuest()">Continue without account</button>
+        <div id="login-msg" style="font-size:12px;color:var(--txt-err);margin-top:8px"></div>
+      </div>
+      <div id="register-form" style="display:none">
+        <input type="text"  id="reg-name"  placeholder="Name" style="width:100%;margin-bottom:8px;padding:9px 12px;border-radius:var(--rad);border:.5px solid var(--brd2);background:var(--bg2);color:var(--txt1);font-size:14px">
+        <input type="email" id="reg-email" placeholder="Email" style="width:100%;margin-bottom:8px;padding:9px 12px;border-radius:var(--rad);border:.5px solid var(--brd2);background:var(--bg2);color:var(--txt1);font-size:14px">
+        <input type="password" id="reg-pass" placeholder="Password (min 6 chars)" style="width:100%;margin-bottom:12px;padding:9px 12px;border-radius:var(--rad);border:.5px solid var(--brd2);background:var(--bg2);color:var(--txt1);font-size:14px">
+        <button class="btn primary" style="width:100%;margin-bottom:8px" onclick="doRegister()">Create account</button>
+        <button class="btn" style="width:100%;font-size:12px" onclick="showLogin()">Back to sign in</button>
+        <div id="reg-msg" style="font-size:12px;color:var(--txt-err);margin-top:8px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── USER PILL ── -->
+  <div id="user-pill" style="display:none;position:fixed;top:12px;right:12px;background:var(--bg1);border:.5px solid var(--brd2);border-radius:50px;padding:5px 14px 5px 10px;font-size:12px;cursor:pointer;z-index:999;display:flex;align-items:center;gap:6px">
+    <span style="width:22px;height:22px;border-radius:50%;background:var(--bg-info);color:var(--txt-info);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500" id="user-avatar">?</span>
+    <span id="user-name-label">Guest</span>
+    <span style="color:var(--txt3);font-size:10px" onclick="doLogout()">Sign out</span>
+  </div>
+
+</div><!-- /app -->
+
+<script>
+/* ── AUDIO ─────────────────────────────────────────────────── */
+const AC = window.AudioContext || window.webkitAudioContext;
+let ac;
+function getAC(){if(!ac){try{ac=new AC();}catch(e){}}return ac;}
+function beep(freq,dur,type,vol,decay){
+  const a=getAC();if(!a)return;
+  const o=a.createOscillator(),g=a.createGain();
+  o.connect(g);g.connect(a.destination);
+  o.type=type||'sine';o.frequency.value=freq;
+  g.gain.setValueAtTime(vol||0.25,a.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+(dur||0.18));
+  o.start(a.currentTime);o.stop(a.currentTime+(decay||dur||0.18));
+}
+function sfxCorrect(){beep(660,0.08,'sine',0.22);setTimeout(()=>beep(880,0.12,'sine',0.18),90);}
+function sfxWrong(){beep(220,0.15,'sawtooth',0.18);setTimeout(()=>beep(180,0.15,'sawtooth',0.14),100);}
+function sfxFlip(){beep(500,0.06,'sine',0.1);}
+function sfxComplete(){
+  [523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,0.12,'sine',0.2),i*80));
+}
+
+/* ── DATA ───────────────────────────────────────────────────── */
+const KANJI=[
+  // ── NUMBERS (数字) ──────────────────────────────────────────────────────
+  {k:"一",on:"いち",kun:"ひと",mean:"one",          emoji:"1️⃣",ex:"一つ・一人・一月",exm:"one thing · one person · January",cat:"numbers"},
+  {k:"二",on:"に",kun:"ふた",mean:"two",             emoji:"2️⃣",ex:"二つ・二人・二月",exm:"two things · two people · February",cat:"numbers"},
+  {k:"三",on:"さん",kun:"み",mean:"three",           emoji:"3️⃣",ex:"三日・三つ・三月",exm:"3rd day · three things · March",cat:"numbers"},
+  {k:"四",on:"し・よん",kun:"よ",mean:"four",        emoji:"4️⃣",ex:"四月・四つ",exm:"April · four things",cat:"numbers"},
+  {k:"五",on:"ご",kun:"いつ",mean:"five",            emoji:"5️⃣",ex:"五時・五つ",exm:"5 o'clock · five things",cat:"numbers"},
+  {k:"六",on:"ろく",kun:"む",mean:"six",             emoji:"6️⃣",ex:"六月・六つ",exm:"June · six things",cat:"numbers"},
+  {k:"七",on:"しち・なな",kun:"なな",mean:"seven",   emoji:"7️⃣",ex:"七月・七つ",exm:"July · seven things",cat:"numbers"},
+  {k:"八",on:"はち",kun:"や",mean:"eight",           emoji:"8️⃣",ex:"八月・八つ",exm:"August · eight things",cat:"numbers"},
+  {k:"九",on:"く・きゅう",kun:"ここの",mean:"nine",  emoji:"9️⃣",ex:"九月・九つ",exm:"September · nine things",cat:"numbers"},
+  {k:"十",on:"じゅう",kun:"とお",mean:"ten",         emoji:"🔟",ex:"十分・十日",exm:"ten minutes · 10th day",cat:"numbers"},
+  {k:"百",on:"ひゃく",kun:"—",mean:"hundred",       emoji:"💯",ex:"三百・百円",exm:"300 · 100 yen",cat:"numbers"},
+  {k:"千",on:"せん",kun:"—",mean:"thousand",        emoji:"🔢",ex:"千円・三千",exm:"1,000 yen · 3,000",cat:"numbers"},
+  {k:"万",on:"まん",kun:"—",mean:"ten-thousand",    emoji:"💴",ex:"一万・三万円",exm:"10,000 · 30,000 yen",cat:"numbers"},
+  {k:"円",on:"えん",kun:"まる",mean:"yen / circle",  emoji:"💰",ex:"百円・丸い",exm:"100 yen · round",cat:"numbers"},
+  // ── TIME (時間) ──────────────────────────────────────────────────────────
+  {k:"年",on:"ねん",kun:"とし",mean:"year",          emoji:"📅",ex:"今年・来年",exm:"this year · next year",cat:"time"},
+  {k:"月",on:"がつ・げつ",kun:"つき",mean:"month / moon",emoji:"🌙",ex:"月曜日・一月",exm:"Monday · January",cat:"time"},
+  {k:"日",on:"にち・じつ",kun:"ひ・か",mean:"day / sun",emoji:"☀️",ex:"今日・日曜日",exm:"today · Sunday",cat:"time"},
+  {k:"時",on:"じ",kun:"とき",mean:"time / hour",    emoji:"🕐",ex:"何時・時間",exm:"what time · time",cat:"time"},
+  {k:"分",on:"ふん・ぷん",kun:"わ",mean:"minute",   emoji:"⏱️",ex:"十分・気分",exm:"10 minutes · feeling",cat:"time"},
+  {k:"半",on:"はん",kun:"—",mean:"half",            emoji:"⏰",ex:"三時半・半分",exm:"3:30 · half portion",cat:"time"},
+  {k:"今",on:"こん",kun:"いま",mean:"now / this",   emoji:"⚡",ex:"今日・今週",exm:"today · this week",cat:"time"},
+  {k:"前",on:"ぜん",kun:"まえ",mean:"before / front",emoji:"⬅️",ex:"名前・午前",exm:"name · AM",cat:"time"},
+  {k:"後",on:"ご",kun:"あと",mean:"after / behind", emoji:"➡️",ex:"午後・後ろ",exm:"PM · behind",cat:"time"},
+  {k:"午",on:"ご",kun:"—",mean:"noon",             emoji:"🕛",ex:"午前・午後",exm:"AM · PM",cat:"time"},
+  {k:"朝",on:"ちょう",kun:"あさ",mean:"morning",    emoji:"🌅",ex:"朝ご飯・今朝",exm:"breakfast · this morning",cat:"time"},
+  {k:"昼",on:"ちゅう",kun:"ひる",mean:"daytime / noon",emoji:"☀️",ex:"昼ご飯・昼間",exm:"lunch · daytime",cat:"time"},
+  {k:"夜",on:"や",kun:"よる",mean:"night / evening",emoji:"🌙",ex:"今夜・夜中",exm:"tonight · midnight",cat:"time"},
+  {k:"週",on:"しゅう",kun:"—",mean:"week",         emoji:"📆",ex:"今週・来週",exm:"this week · next week",cat:"time"},
+  {k:"毎",on:"まい",kun:"—",mean:"every",          emoji:"🔄",ex:"毎日・毎週",exm:"every day · every week",cat:"time"},
+  {k:"春",on:"しゅん",kun:"はる",mean:"spring",     emoji:"🌸",ex:"春休み・春分",exm:"spring break · spring equinox",cat:"time"},
+  {k:"夏",on:"か",kun:"なつ",mean:"summer",         emoji:"🏖️",ex:"夏休み・夏祭り",exm:"summer vacation · summer festival",cat:"time"},
+  {k:"秋",on:"しゅう",kun:"あき",mean:"autumn",     emoji:"🍂",ex:"秋祭り・秋分",exm:"autumn festival · autumn equinox",cat:"time"},
+  {k:"冬",on:"とう",kun:"ふゆ",mean:"winter",       emoji:"❄️",ex:"冬休み・冬至",exm:"winter vacation · winter solstice",cat:"time"},
+  // ── PEOPLE (人) ─────────────────────────────────────────────────────────
+  {k:"人",on:"じん・にん",kun:"ひと",mean:"person",  emoji:"🧑",ex:"日本人・何人",exm:"Japanese person · how many people",cat:"people"},
+  {k:"子",on:"し",kun:"こ",mean:"child",            emoji:"👦",ex:"子供・女の子",exm:"child · girl",cat:"people"},
+  {k:"女",on:"じょ",kun:"おんな",mean:"woman",      emoji:"👩",ex:"女の人・女性",exm:"woman · female",cat:"people"},
+  {k:"男",on:"だん",kun:"おとこ",mean:"man",        emoji:"👨",ex:"男の人・男性",exm:"man · male",cat:"people"},
+  {k:"父",on:"ふ",kun:"ちち",mean:"father",         emoji:"👨‍👧",ex:"お父さん・父親",exm:"(your) father · father",cat:"people"},
+  {k:"母",on:"ぼ",kun:"はは",mean:"mother",         emoji:"👩‍👧",ex:"お母さん・母親",exm:"(your) mother · mother",cat:"people"},
+  {k:"友",on:"ゆう",kun:"とも",mean:"friend",       emoji:"🤝",ex:"友達・友人",exm:"friend (casual) · friend (formal)",cat:"people"},
+  {k:"先",on:"せん",kun:"さき",mean:"ahead / prior", emoji:"🥇",ex:"先生・先週",exm:"teacher · last week",cat:"people"},
+  {k:"生",on:"せい",kun:"い・なま",mean:"life / birth",emoji:"🌱",ex:"学生・先生",exm:"student · teacher",cat:"people"},
+  {k:"名",on:"めい",kun:"な",mean:"name",           emoji:"🏷️",ex:"名前・有名",exm:"name · famous",cat:"people"},
+  // ── BODY (体) ───────────────────────────────────────────────────────────
+  {k:"口",on:"こう",kun:"くち",mean:"mouth",        emoji:"👄",ex:"出口・入口",exm:"exit · entrance",cat:"body"},
+  {k:"目",on:"もく",kun:"め",mean:"eye",            emoji:"👁️",ex:"目的・注目",exm:"purpose · attention",cat:"body"},
+  {k:"耳",on:"じ",kun:"みみ",mean:"ear",            emoji:"👂",ex:"耳鼻科",exm:"ear-nose clinic",cat:"body"},
+  {k:"手",on:"しゅ",kun:"て",mean:"hand",           emoji:"✋",ex:"手紙・上手",exm:"letter · skilled",cat:"body"},
+  {k:"足",on:"そく",kun:"あし",mean:"foot / leg",   emoji:"🦵",ex:"足音・土足",exm:"footstep · shoes on floor",cat:"body"},
+  {k:"体",on:"たい",kun:"からだ",mean:"body",       emoji:"🫀",ex:"体育・体力",exm:"physical education · stamina",cat:"body"},
+  {k:"力",on:"りょく",kun:"ちから",mean:"strength / power",emoji:"💪",ex:"体力・電力",exm:"stamina · electric power",cat:"body"},
+  // ── NATURE (自然) ───────────────────────────────────────────────────────
+  {k:"山",on:"さん",kun:"やま",mean:"mountain",     emoji:"🏔️",ex:"富士山・山道",exm:"Mt. Fuji · mountain path",cat:"nature"},
+  {k:"川",on:"せん",kun:"かわ",mean:"river",        emoji:"🏞️",ex:"川沿い・川辺",exm:"along the river · riverbank",cat:"nature"},
+  {k:"海",on:"かい",kun:"うみ",mean:"sea / ocean",  emoji:"🌊",ex:"海外・海水",exm:"overseas · seawater",cat:"nature"},
+  {k:"水",on:"すい",kun:"みず",mean:"water",        emoji:"💧",ex:"水曜日・水道",exm:"Wednesday · waterworks",cat:"nature"},
+  {k:"火",on:"か",kun:"ひ",mean:"fire",             emoji:"🔥",ex:"火曜日・花火",exm:"Tuesday · fireworks",cat:"nature"},
+  {k:"木",on:"もく",kun:"き",mean:"tree / wood",    emoji:"🌳",ex:"木曜日・木材",exm:"Thursday · timber",cat:"nature"},
+  {k:"金",on:"きん",kun:"かね",mean:"gold / money", emoji:"💰",ex:"金曜日・お金",exm:"Friday · money",cat:"nature"},
+  {k:"土",on:"ど",kun:"つち",mean:"earth / soil",   emoji:"🌍",ex:"土曜日・土地",exm:"Saturday · land",cat:"nature"},
+  {k:"空",on:"くう",kun:"そら",mean:"sky / empty",  emoji:"🌤️",ex:"空港・青空",exm:"airport · blue sky",cat:"nature"},
+  {k:"天",on:"てん",kun:"—",mean:"heaven / sky",   emoji:"🌌",ex:"天気・天井",exm:"weather · ceiling",cat:"nature"},
+  {k:"雨",on:"う",kun:"あめ",mean:"rain",           emoji:"🌧️",ex:"大雨・梅雨",exm:"heavy rain · rainy season",cat:"nature"},
+  {k:"雪",on:"せつ",kun:"ゆき",mean:"snow",         emoji:"❄️",ex:"大雪・初雪",exm:"heavy snow · first snow",cat:"nature"},
+  {k:"風",on:"ふう",kun:"かぜ",mean:"wind",         emoji:"💨",ex:"台風・風景",exm:"typhoon · scenery",cat:"nature"},
+  {k:"花",on:"か",kun:"はな",mean:"flower",         emoji:"🌸",ex:"花火・花見",exm:"fireworks · flower viewing",cat:"nature"},
+  {k:"気",on:"き・け",kun:"—",mean:"spirit / air", emoji:"✨",ex:"天気・元気",exm:"weather · healthy",cat:"nature"},
+  {k:"田",on:"でん",kun:"た",mean:"rice field",     emoji:"🌾",ex:"田んぼ・田舎",exm:"rice paddy · countryside",cat:"nature"},
+  // ── ACTIONS (動作) ───────────────────────────────────────────────────────
+  {k:"見",on:"けん",kun:"み",mean:"see / look",     emoji:"👀",ex:"見物・見せる",exm:"sightseeing · to show",cat:"actions"},
+  {k:"食",on:"しょく",kun:"た",mean:"eat / food",   emoji:"🍽️",ex:"食事・食堂",exm:"meal · dining hall",cat:"actions"},
+  {k:"飲",on:"いん",kun:"の",mean:"drink",          emoji:"🥤",ex:"飲み物・飲む",exm:"beverage · to drink",cat:"actions"},
+  {k:"行",on:"こう",kun:"い",mean:"go",             emoji:"🚶",ex:"旅行・銀行",exm:"travel · bank",cat:"actions"},
+  {k:"来",on:"らい",kun:"く・き",mean:"come",        emoji:"🙌",ex:"来年・来週",exm:"next year · next week",cat:"actions"},
+  {k:"出",on:"しゅつ",kun:"で",mean:"exit / leave", emoji:"🚪",ex:"出口・外出",exm:"exit · going out",cat:"actions"},
+  {k:"入",on:"にゅう",kun:"はい",mean:"enter",      emoji:"➡️",ex:"入口・入学",exm:"entrance · school enrollment",cat:"actions"},
+  {k:"帰",on:"き",kun:"かえ",mean:"return home",    emoji:"🏠",ex:"帰国・帰宅",exm:"return to homeland · going home",cat:"actions"},
+  {k:"買",on:"ばい",kun:"か",mean:"buy",            emoji:"🛒",ex:"買い物・買う",exm:"shopping · to buy",cat:"actions"},
+  {k:"会",on:"かい",kun:"あ",mean:"meet / meeting", emoji:"🤝",ex:"会社・会議",exm:"company · meeting",cat:"actions"},
+  {k:"休",on:"きゅう",kun:"やす",mean:"rest / break",emoji:"😴",ex:"休日・夏休み",exm:"day off · summer vacation",cat:"actions"},
+  {k:"起",on:"き",kun:"お",mean:"wake up / rise",  emoji:"⏰",ex:"起きる・起こす",exm:"to wake up · to rouse",cat:"actions"},
+  {k:"走",on:"そう",kun:"はし",mean:"run",          emoji:"🏃",ex:"走者・走る",exm:"runner · to run",cat:"actions"},
+  {k:"歩",on:"ほ",kun:"ある",mean:"walk",           emoji:"🚶‍♂️",ex:"歩道・散歩",exm:"sidewalk · a walk",cat:"actions"},
+  {k:"泳",on:"えい",kun:"およ",mean:"swim",         emoji:"🏊",ex:"水泳・泳ぐ",exm:"swimming · to swim",cat:"actions"},
+  {k:"書",on:"しょ",kun:"か",mean:"write",          emoji:"✏️",ex:"教科書・書道",exm:"textbook · calligraphy",cat:"actions"},
+  {k:"読",on:"どく",kun:"よ",mean:"read",           emoji:"📖",ex:"読書・読み方",exm:"reading books · how to read",cat:"actions"},
+  {k:"話",on:"わ",kun:"はな",mean:"speak / story",  emoji:"💬",ex:"電話・会話",exm:"phone call · conversation",cat:"actions"},
+  {k:"聞",on:"ぶん",kun:"き",mean:"listen / ask",   emoji:"👂",ex:"新聞・質問",exm:"newspaper · question",cat:"actions"},
+  {k:"作",on:"さく",kun:"つく",mean:"make / create",emoji:"🛠️",ex:"作品・制作",exm:"artwork · production",cat:"actions"},
+  {k:"切",on:"せつ",kun:"き",mean:"cut",            emoji:"✂️",ex:"大切・切手",exm:"important · postage stamp",cat:"actions"},
+  // ── ADJECTIVES (形容詞) ──────────────────────────────────────────────────
+  {k:"大",on:"だい・たい",kun:"おお",mean:"big / great",emoji:"🔆",ex:"大学・大切",exm:"university · important",cat:"adjectives"},
+  {k:"小",on:"しょう",kun:"ちい",mean:"small",      emoji:"🔅",ex:"小学校・小さい",exm:"elementary school · small",cat:"adjectives"},
+  {k:"白",on:"はく",kun:"しろ",mean:"white",        emoji:"⬜",ex:"白黒・白板",exm:"black & white · whiteboard",cat:"adjectives"},
+  {k:"黒",on:"こく",kun:"くろ",mean:"black",        emoji:"⬛",ex:"黒板・黒字",exm:"blackboard · black ink",cat:"adjectives"},
+  {k:"赤",on:"せき",kun:"あか",mean:"red",          emoji:"🔴",ex:"赤ちゃん・赤信号",exm:"baby · red light",cat:"adjectives"},
+  {k:"青",on:"せい",kun:"あお",mean:"blue / green",  emoji:"🔵",ex:"青空・青春",exm:"blue sky · youth",cat:"adjectives"},
+  {k:"高",on:"こう",kun:"たか",mean:"tall / expensive",emoji:"📈",ex:"高校・高い",exm:"high school · tall",cat:"adjectives"},
+  {k:"安",on:"あん",kun:"やす",mean:"cheap / safe", emoji:"💸",ex:"安全・安心",exm:"safety · peace of mind",cat:"adjectives"},
+  {k:"新",on:"しん",kun:"あたら",mean:"new",        emoji:"🆕",ex:"新聞・新幹線",exm:"newspaper · bullet train",cat:"adjectives"},
+  {k:"古",on:"こ",kun:"ふる",mean:"old (things)",   emoji:"🏺",ex:"古本・古い",exm:"used book · old",cat:"adjectives"},
+  {k:"長",on:"ちょう",kun:"なが",mean:"long / chief",emoji:"📏",ex:"社長・長い",exm:"company president · long",cat:"adjectives"},
+  {k:"明",on:"めい",kun:"あか",mean:"bright / clear",emoji:"💡",ex:"明るい・明日",exm:"bright · tomorrow",cat:"adjectives"},
+  // ── DIRECTIONS (方向・位置) ──────────────────────────────────────────────
+  {k:"東",on:"とう",kun:"ひがし",mean:"east",        emoji:"🧭",ex:"東京・東口",exm:"Tokyo · east exit",cat:"directions"},
+  {k:"西",on:"せい",kun:"にし",mean:"west",          emoji:"🧭",ex:"関西・西口",exm:"Kansai region · west exit",cat:"directions"},
+  {k:"南",on:"なん",kun:"みなみ",mean:"south",       emoji:"🧭",ex:"南口・南国",exm:"south exit · southern land",cat:"directions"},
+  {k:"北",on:"ほく",kun:"きた",mean:"north",         emoji:"🧭",ex:"北海道・北口",exm:"Hokkaido · north exit",cat:"directions"},
+  {k:"上",on:"じょう",kun:"うえ",mean:"up / above",  emoji:"⬆️",ex:"上手・机の上",exm:"skilled · on the desk",cat:"directions"},
+  {k:"下",on:"か",kun:"した",mean:"down / below",    emoji:"⬇️",ex:"下手・地下",exm:"unskilled · underground",cat:"directions"},
+  {k:"右",on:"う",kun:"みぎ",mean:"right",           emoji:"👉",ex:"右側・右手",exm:"right side · right hand",cat:"directions"},
+  {k:"左",on:"さ",kun:"ひだり",mean:"left",          emoji:"👈",ex:"左側・左手",exm:"left side · left hand",cat:"directions"},
+  {k:"中",on:"ちゅう",kun:"なか",mean:"middle / inside",emoji:"🎯",ex:"中学・中国",exm:"middle school · China",cat:"directions"},
+  {k:"外",on:"がい",kun:"そと",mean:"outside",       emoji:"🌳",ex:"外国・外出",exm:"foreign country · going out",cat:"directions"},
+  // ── PLACES (場所) ───────────────────────────────────────────────────────
+  {k:"国",on:"こく",kun:"くに",mean:"country / nation",emoji:"🗾",ex:"外国・日本国",exm:"foreign country · Japan",cat:"places"},
+  {k:"学",on:"がく",kun:"まな",mean:"study / learning",emoji:"📚",ex:"大学・学生",exm:"university · student",cat:"places"},
+  {k:"校",on:"こう",kun:"—",mean:"school",          emoji:"🏫",ex:"学校・高校",exm:"school · high school",cat:"places"},
+  {k:"語",on:"ご",kun:"かた",mean:"language / word",  emoji:"💬",ex:"日本語・英語",exm:"Japanese · English",cat:"places"},
+  {k:"本",on:"ほん",kun:"もと",mean:"book / origin", emoji:"📖",ex:"日本・本棚",exm:"Japan · bookshelf",cat:"places"},
+  {k:"電",on:"でん",kun:"—",mean:"electricity",     emoji:"⚡",ex:"電話・電車",exm:"phone call · train",cat:"places"},
+  {k:"車",on:"しゃ",kun:"くるま",mean:"car / vehicle",emoji:"🚗",ex:"電車・自動車",exm:"train · automobile",cat:"places"},
+  {k:"駅",on:"えき",kun:"—",mean:"station",        emoji:"🚉",ex:"東京駅・駅前",exm:"Tokyo Station · in front of station",cat:"places"},
+  // ── QUESTION WORDS (疑問詞) ──────────────────────────────────────────────
+  {k:"何",on:"か",kun:"なに・なん",mean:"what / how many",emoji:"❓",ex:"何時・何人",exm:"what time · how many people",cat:"question"},
+];
+
+/* ── STATE ──────────────────────────────────────────────────── */
+let deck=[...KANJI],idx=0,flipped=false;
+let known=new Set(),learning=new Set(),streak=0;
+let filterCat='all',mode='flash';
+
+let quizAnswered=false,quizQ=0,quizTotal=10,quizCorrect=0,currentQuizReadingKey='on';
+let matchSel={side:null,idx:null,el:null},matchPairs=[],matchMatched=new Set();
+
+/* ── HELPERS ────────────────────────────────────────────────── */
+function getRandom(arr,n,exclude){
+  const pool=arr.filter(k=>k!==exclude);
+  const out=[];
+  while(out.length<n&&pool.length){const i=Math.floor(Math.random()*pool.length);out.push(pool.splice(i,1)[0]);}
+  return out;
+}
+function rand(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+function pick(arr){return arr[Math.floor(Math.random()*arr.length)];}
+
+/* ── FILTER / MODE ──────────────────────────────────────────── */
+function setFilter(cat,btn){
+  filterCat=cat;
+  document.querySelectorAll('#cat-filter-row .filter-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  deck=cat==='all'?[...KANJI]:KANJI.filter(k=>k.cat===cat);
+  idx=0;isShuffled=false;
+  const sb=document.getElementById('shuffle-btn');if(sb){sb.textContent='Shuffle';sb.classList.remove('primary');}
+  document.getElementById('deck-info').textContent=deck.length+' kanji · '+(cat==='all'?'All categories':cat);
+  if(mode==='list'){renderMosaic();return;}
+  resetMode();
+}
+
+function setMode(m,btn){
+  mode=m;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  resetMode();
+}
+
+function resetMode(){
+  ['flash-mode','quiz-mode','match-mode','result-screen'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+  if(mode==='flash'){document.getElementById('flash-mode').classList.remove('hidden');showCard();}
+  else if(mode==='quiz'){document.getElementById('quiz-mode').classList.remove('hidden');document.getElementById('quiz-game').classList.add('hidden');document.getElementById('quiz-start-hint').classList.remove('hidden');}
+  else if(mode==='match'){document.getElementById('match-mode').classList.remove('hidden');newMatchRound();}
+  updateStats();
+}
+
+/* ── FLASHCARD ──────────────────────────────────────────────── */
+function showCard(){
+  if(!deck.length)return;
+  const k=deck[idx];
+  document.getElementById('front-kanji').textContent=k.k;
+  document.getElementById('front-cat').textContent=k.cat;
+  document.getElementById('back-emoji').textContent=k.emoji;
+  document.getElementById('back-kanji').textContent=k.k;
+  document.getElementById('back-meaning').textContent=k.mean;
+  document.getElementById('back-readings').innerHTML=
+    '<span class="pill pill-on">ON: '+k.on+'</span>'+
+    '<span class="pill pill-kun">KUN: '+k.kun+'</span>';
+  document.getElementById('back-examples').textContent=k.ex;
+  document.getElementById('back-ex-meaning').textContent=k.exm;
+  const card=document.getElementById('card');
+  card.classList.remove('flipped');
+  flipped=false;
+  document.getElementById('rate-btns').style.display='none';
+  document.getElementById('nav-pos').textContent=(idx+1)+' / '+deck.length;
+  updateProgress();
+}
+
+function flipCard(){
+  if(mode!=='flash')return;
+  flipped=!flipped;
+  document.getElementById('card').classList.toggle('flipped',flipped);
+  document.getElementById('rate-btns').style.display=flipped?'flex':'none';
+  sfxFlip();
+}
+
+function rate(gotIt){
+  const k=deck[idx];
+  if(gotIt){known.add(k.k);learning.delete(k.k);streak++;}
+  else{learning.add(k.k);known.delete(k.k);streak=0;}
+  updateStats();
+  if(idx<deck.length-1){idx++;showCard();}
+  else{showResult();}
+}
+
+function next(){if(idx<deck.length-1){idx++;showCard();}}
+function prev(){if(idx>0){idx--;showCard();}}
+
+function shuffle(){
+  for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}
+  idx=0;showCard();
+}
+
+/* ── QUIZ ───────────────────────────────────────────────────── */
+/*
+  Quiz types (controlled by #quiz-type-checklist):
+  0   = Kanji → Meaning
+  2   = Meaning → Kanji
+  rk  = Readings → Kanji  (show ON · KUN, pick kanji)
+  kr  = Kanji → Readings  (show kanji, pick ON · KUN combo)
+  3on = ON reading → Kanji
+  1on = Kanji → ON reading
+  3kun= KUN reading → Kanji
+  1kun= Kanji → KUN reading
+*/
+let currentQuizType=0;
+
+function startQuiz(){
+  const n=parseInt(document.getElementById('quiz-count').value)||10;
+  quizTotal=Math.min(Math.max(n,1),deck.length*3);
+  quizQ=0;quizCorrect=0;
+  document.getElementById('quiz-start-hint').classList.add('hidden');
+  document.getElementById('quiz-game').classList.remove('hidden');
+  newQuizRound();
+}
+
+function newQuizRound(){
+  if(quizQ>=quizTotal){endQuiz();return;}
+  quizAnswered=false;
+
+  // determine which quiz type to use this round
+  const checked=[...document.querySelectorAll('#quiz-type-checklist input:checked')].map(c=>c.value);
+  const activeTypes=checked.length?checked:['0','2','rk','kr','3on','1on','3kun','1kun'];
+  const chosenType=pick(activeTypes);
+
+  const typeLabels={
+    '0':'Kanji → Meaning','2':'Meaning → Kanji',
+    'rk':'Readings → Kanji','kr':'Kanji → Readings',
+    '3on':'ON reading → Kanji','1on':'Kanji → ON reading',
+    '3kun':'KUN reading → Kanji','1kun':'Kanji → KUN reading',
+  };
+  document.getElementById('quiz-type-badge').textContent=typeLabels[chosenType]||chosenType;
+
+  // pick a kanji that has valid readings for the chosen type
+  let k,attempts=0;
+  do{k=pick(deck);attempts++;}while(attempts<20&&(['1kun','3kun'].includes(chosenType)&&k.kun==='—'));
+
+  document.getElementById('q-cat').textContent=k.cat;
+  document.getElementById('q-prog').textContent='Question '+(quizQ+1)+' of '+quizTotal+' · '+quizCorrect+' correct';
+
+  const stimulus=document.getElementById('q-stimulus');
+  const prompt=document.getElementById('q-prompt');
+  const container=document.getElementById('q-opts');
+  container.innerHTML='';
+
+  function makeBtn(label,isKanji,isCorrect){
+    const btn=document.createElement('button');
+    btn.className='opt-btn';
+    if(isKanji) btn.innerHTML='<span class="opt-kanji">'+label+'</span>';
+    else btn.textContent=label;
+    btn.onclick=()=>handleQuizAnswer(btn,isCorrect,k,container,chosenType);
+    container.appendChild(btn);
+  }
+
+  function buildOpts(pool,correctVal,isKanji){
+    const opts=[correctVal,...pool.filter(v=>v!==correctVal&&v!=='—').slice(0,3)];
+    // pad if needed
+    while(opts.length<4){opts.push('？');}
+    opts.slice(0,4).sort(()=>Math.random()-.5).forEach(o=>makeBtn(o,isKanji,o===correctVal));
+  }
+
+  if(chosenType==='0'){
+    // Kanji → Meaning
+    stimulus.textContent=k.k; stimulus.style.fontSize='76px';
+    prompt.textContent='What is the meaning of this kanji?';
+    buildOpts(getRandom(deck,3,k).map(d=>d.mean),k.mean,false);
+
+  } else if(chosenType==='2'){
+    // Meaning → Kanji
+    stimulus.textContent=k.mean; stimulus.style.fontSize='26px';
+    prompt.textContent='Which kanji has this meaning?';
+    buildOpts(getRandom(deck,3,k).map(d=>d.k),k.k,true);
+
+  } else if(chosenType==='rk'){
+    // Readings → Kanji: show ON · KUN, pick kanji
+    const reading=(k.kun!=='—')?k.on+' · '+k.kun:k.on;
+    stimulus.textContent=reading; stimulus.style.fontSize='26px';
+    prompt.textContent='Which kanji has these readings?';
+    buildOpts(getRandom(deck,3,k).map(d=>d.k),k.k,true);
+
+  } else if(chosenType==='kr'){
+    // Kanji → Readings: show kanji, pick ON · KUN combo
+    stimulus.textContent=k.k; stimulus.style.fontSize='76px';
+    prompt.textContent='Which readings belong to this kanji?';
+    const correctReading=(k.kun!=='—')?k.on+' · '+k.kun:k.on;
+    const wrongReadings=getRandom(deck,3,k).map(d=>(d.kun!=='—')?d.on+' · '+d.kun:d.on);
+    buildOpts(wrongReadings,correctReading,false);
+
+  } else if(chosenType==='3on'){
+    // ON reading → Kanji
+    stimulus.textContent=k.on; stimulus.style.fontSize='32px';
+    prompt.textContent='Which kanji has this ON reading (音読み)?';
+    buildOpts(getRandom(deck,3,k).map(d=>d.k),k.k,true);
+
+  } else if(chosenType==='1on'){
+    // Kanji → ON reading
+    stimulus.textContent=k.k; stimulus.style.fontSize='76px';
+    prompt.textContent='What is the ON reading (音読み) of this kanji?';
+    currentQuizReadingKey='on';
+    buildOpts(getRandom(deck,3,k).map(d=>d.on),k.on,false);
+
+  } else if(chosenType==='3kun'){
+    // KUN reading → Kanji
+    stimulus.textContent=k.kun; stimulus.style.fontSize='32px';
+    prompt.textContent='Which kanji has this KUN reading (訓読み)?';
+    buildOpts(getRandom(deck,3,k).map(d=>d.k),k.k,true);
+
+  } else if(chosenType==='1kun'){
+    // Kanji → KUN reading
+    stimulus.textContent=k.k; stimulus.style.fontSize='76px';
+    prompt.textContent='What is the KUN reading (訓読み) of this kanji?';
+    currentQuizReadingKey='kun';
+    buildOpts(getRandom(deck,3,k).filter(d=>d.kun!=='—').map(d=>d.kun),k.kun,false);
+  }
+}
+
+function handleQuizAnswer(btn,correct,k,container,chosenType){
+  if(quizAnswered)return;
+  quizAnswered=true;
+  quizQ++;
+  btn.classList.add(correct?'correct':'wrong');
+  if(correct){quizCorrect++;known.add(k.k);learning.delete(k.k);streak++;sfxCorrect();}
+  else{
+    learning.add(k.k);known.delete(k.k);streak=0;sfxWrong();
+    // highlight the correct button
+    const isKanjiAnswer=['2','rk','3on','3kun'].includes(chosenType);
+    container.querySelectorAll('.opt-btn').forEach(b=>{
+      if(isKanjiAnswer){
+        if(b.querySelector('.opt-kanji')&&b.querySelector('.opt-kanji').textContent===k.k) b.classList.add('correct');
+      } else {
+        let correctVal;
+        if(chosenType==='0') correctVal=k.mean;
+        else if(chosenType==='1on') correctVal=k.on;
+        else if(chosenType==='1kun') correctVal=k.kun;
+        else if(chosenType==='kr') correctVal=(k.kun!=='—')?k.on+' · '+k.kun:k.on;
+        else correctVal=currentQuizReadingKey==='on'?k.on:k.kun;
+        if(b.textContent===correctVal) b.classList.add('correct');
+      }
+    });
+  }
+  updateStats();
+  document.getElementById('q-prog').textContent='Question '+quizQ+' of '+quizTotal+' · '+quizCorrect+' correct';
+  setTimeout(newQuizRound,1300);
+}
+
+function skipQuiz(){quizQ++;newQuizRound();}
+
+function endQuiz(){
+  document.getElementById('quiz-game').classList.add('hidden');
+  document.getElementById('quiz-start-hint').classList.remove('hidden');
+  document.getElementById('quiz-start-hint').textContent=
+    'Session complete! Score: '+quizCorrect+' / '+quizTotal+
+    ' ('+Math.round(quizCorrect/quizTotal*100)+'%). Press Start for a new session.';
+  if(quizCorrect===quizTotal)sfxComplete();
+}
+
+/* ── MATCH ──────────────────────────────────────────────────── */
+function newMatchRound(){
+  matchSel={side:null,idx:null,el:null};
+  matchMatched=new Set();
+  const n=parseInt(document.getElementById('match-count').value)||6;
+  const count=Math.min(Math.max(n,2),Math.min(10,deck.length));
+  matchPairs=getRandom(deck,count,null);
+  const shuffledMeans=[...matchPairs].sort(()=>Math.random()-.5);
+  const kCol=document.getElementById('match-kanji-col');
+  const mCol=document.getElementById('match-mean-col');
+  kCol.innerHTML='';mCol.innerHTML='';
+  matchPairs.forEach((k,i)=>{
+    const el=document.createElement('div');
+    el.className='match-item';
+    el.innerHTML='<span class="match-kanji">'+k.k+'</span>';
+    el.onclick=()=>selectMatch(i,'k',el);
+    kCol.appendChild(el);
+  });
+  shuffledMeans.forEach(k=>{
+    const realIdx=matchPairs.indexOf(k);
+    const el=document.createElement('div');
+    el.className='match-item';
+    el.textContent=k.mean;
+    el.onclick=()=>selectMatch(realIdx,'m',el);
+    mCol.appendChild(el);
+  });
+}
+
+let matchLocked=false;
+function selectMatch(idx,side,el){
+  if(el.classList.contains('matched'))return;
+  if(matchLocked)return;
+  const all=document.querySelectorAll('.match-item:not(.matched)');
+  if(matchSel.side===null){
+    // nothing selected yet — select this item
+    all.forEach(e=>e.classList.remove('selected'));
+    el.classList.add('selected');
+    matchSel={side,idx,el};
+  } else if(matchSel.side===side){
+    // same column clicked — swap selection within that column
+    all.forEach(e=>e.classList.remove('selected'));
+    el.classList.add('selected');
+    matchSel={side,idx,el};
+  } else {
+    // opposite column clicked — evaluate the pair
+    const match=matchSel.idx===idx;
+    if(match){
+      el.classList.add('matched');matchSel.el.classList.add('matched');
+      matchMatched.add(idx);known.add(matchPairs[idx].k);streak++;
+      matchSel={side:null,idx:null,el:null};
+      sfxCorrect();updateStats();
+      if(matchMatched.size===matchPairs.length){sfxComplete();setTimeout(newMatchRound,700);}
+    } else {
+      const prevEl=matchSel.el;
+      matchSel={side:null,idx:null,el:null};
+      matchLocked=true;
+      el.classList.add('wrong');prevEl.classList.add('wrong');
+      learning.add(matchPairs[idx].k);streak=0;sfxWrong();updateStats();
+      setTimeout(()=>{
+        el.classList.remove('wrong','selected');
+        prevEl.classList.remove('wrong','selected');
+        matchLocked=false;
+      },700);
+    }
+  }
+}
+
+/* ── STATS / RESULT ─────────────────────────────────────────── */
+function updateStats(){
+  document.getElementById('s-total').textContent=deck.length;
+  document.getElementById('s-know').textContent=known.size;
+  document.getElementById('s-learn').textContent=learning.size;
+  document.getElementById('s-streak').textContent=streak;
+}
+
+function updateProgress(){
+  const pct=deck.length?Math.round((idx+1)/deck.length*100):0;
+  document.getElementById('prog').style.width=pct+'%';
+  document.getElementById('prog-label').textContent='Card '+(idx+1)+' of '+deck.length;
+  document.getElementById('prog-pct').textContent=pct+'%';
+}
+
+function showResult(){
+  ['flash-mode','quiz-mode','match-mode'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+  document.getElementById('result-screen').classList.remove('hidden');
+  const pct=deck.length?Math.round(known.size/deck.length*100):0;
+  document.getElementById('res-emoji').textContent=pct>=80?'★':pct>=50?'◎':'△';
+  document.getElementById('res-title').textContent=pct>=80?'Excellent!':pct>=50?'Good progress!':'Keep studying!';
+  document.getElementById('res-sub').textContent=pct+'% known · Best streak: '+streak;
+  document.getElementById('res-stats').innerHTML=
+    '<div class="stat good"><div class="stat-n">'+known.size+'</div><div class="stat-l">known</div></div>'+
+    '<div class="stat bad"><div class="stat-n">'+learning.size+'</div><div class="stat-l">learning</div></div>';
+  if(pct>=80)sfxComplete();
+}
+
+function restartDeck(){
+  idx=0;known.clear();learning.clear();streak=0;
+  document.getElementById('result-screen').classList.add('hidden');
+  resetMode();
+}
+
+function reviewWeak(){
+  if(!learning.size)return;
+  deck=KANJI.filter(k=>learning.has(k.k));
+  idx=0;known.clear();learning.clear();
+  document.getElementById('result-screen').classList.add('hidden');
+  resetMode();
+}
+
+/* ── CHECKLIST HELPERS ──────────────────────────────────────── */
+function checkNone(){
+  document.querySelectorAll('#quiz-type-checklist input').forEach(c=>c.checked=false);
+  updateStartBtn();
+}
+function checkAll(){
+  document.querySelectorAll('#quiz-type-checklist input').forEach(c=>c.checked=true);
+  updateStartBtn();
+}
+function updateStartBtn(){
+  const any=[...document.querySelectorAll('#quiz-type-checklist input')].some(c=>c.checked);
+  document.getElementById('quiz-start-btn').disabled=!any;
+}
+
+
+/* ── PERSISTENCE (localStorage) ────────────────────────────── */
+const STORE_KEY='n5kf_v1';
+function saveSession(){
+  try{
+    localStorage.setItem(STORE_KEY,JSON.stringify({
+      known:[...known],
+      learning:[...learning],
+      srsData:Object.fromEntries(Object.entries(srsData).map(([k,v])=>[k,v])),
+      customKanji:[...customKanji],
+    }));
+  }catch(e){}
+}
+function loadSession(){
+  try{
+    const d=JSON.parse(localStorage.getItem(STORE_KEY)||'{}');
+    if(d.known)known=new Set(d.known);
+    if(d.learning)learning=new Set(d.learning);
+    if(d.srsData)Object.entries(d.srsData).forEach(([k,v])=>srsData[k]=v);
+    if(d.customKanji)customKanji=new Set(d.customKanji);
+  }catch(e){}
+}
+
+/* ── SRS DATA ───────────────────────────────────────────────── */
+// Each entry: {interval, ease, due, reps}
+// interval in days, due = timestamp ms
+const srsData={};
+let srsQueue=[],srsCardIdx=0,srsFlipped=false;
+const SRS_INTERVALS=[0,1,3,7,14,30,90]; // days after each rating
+
+function srsEntry(k){
+  if(!srsData[k.k]) srsData[k.k]={interval:0,ease:2.5,due:0,reps:0};
+  return srsData[k.k];
+}
+function srsIsDue(k){
+  const e=srsEntry(k);
+  return e.due<=Date.now();
+}
+function buildSRSQueue(){
+  // due cards first, then new (unseen) cards
+  const due=deck.filter(k=>srsData[k.k]&&srsIsDue(k));
+  const unseen=deck.filter(k=>!srsData[k.k]);
+  srsQueue=[...due,...unseen];
+  srsCardIdx=0;
+}
+function startSRS(){
+  buildSRSQueue();
+  document.getElementById('srs-done').classList.add('hidden');
+  document.getElementById('srs-card').classList.remove('hidden');
+  document.getElementById('srs-rate-btns').style.display='none';
+  if(!srsQueue.length){
+    document.getElementById('srs-done').classList.remove('hidden');
+    document.getElementById('srs-card').classList.add('hidden');
+    return;
+  }
+  showSRSCard();
+}
+function showSRSCard(){
+  if(srsCardIdx>=srsQueue.length){
+    document.getElementById('srs-done').classList.remove('hidden');
+    document.getElementById('srs-card').classList.add('hidden');
+    document.getElementById('srs-rate-btns').style.display='none';
+    return;
+  }
+  const k=srsQueue[srsCardIdx];
+  const e=srsEntry(k);
+  const due=srsQueue.filter((_,i)=>i>=srsCardIdx).length;
+  document.getElementById('srs-queue-info').textContent=due+' card'+(due===1?'':'s')+' remaining in this session';
+  document.getElementById('srs-next-info').textContent=e.reps===0?'New card':'Interval: '+e.interval+' day'+(e.interval===1?'':'s');
+  document.getElementById('srs-front-kanji').textContent=k.k;
+  document.getElementById('srs-front-cat').textContent=k.cat;
+  document.getElementById('srs-back-emoji').textContent=k.emoji;
+  document.getElementById('srs-back-kanji').textContent=k.k;
+  document.getElementById('srs-back-meaning').textContent=k.mean;
+  document.getElementById('srs-back-readings').innerHTML=
+    '<span class="pill pill-on">ON: '+k.on+'</span><span class="pill pill-kun">KUN: '+k.kun+'</span>';
+  document.getElementById('srs-back-examples').textContent=k.ex;
+  document.getElementById('srs-back-exm').textContent=k.exm;
+  const card=document.getElementById('srs-card');
+  card.classList.remove('flipped');
+  srsFlipped=false;
+  document.getElementById('srs-rate-btns').style.display='none';
+}
+function flipSRS(){
+  if(!srsQueue.length||srsCardIdx>=srsQueue.length)return;
+  srsFlipped=!srsFlipped;
+  document.getElementById('srs-card').classList.toggle('flipped',srsFlipped);
+  document.getElementById('srs-rate-btns').style.display=srsFlipped?'flex':'none';
+  if(srsFlipped)sfxFlip();
+}
+function rateSRS(rating){
+  // rating: 1=again 2=hard 3=good 4=easy
+  const k=srsQueue[srsCardIdx];
+  const e=srsEntry(k);
+  e.reps++;
+  if(rating===1){
+    e.interval=0; e.ease=Math.max(1.3,e.ease-0.2);
+    // push to back of queue for review this session
+    srsQueue.push(k);
+    learning.add(k.k); known.delete(k.k);
+  } else {
+    const mult=rating===2?0.8:rating===3?e.ease:e.ease*1.3;
+    e.interval=Math.max(1,Math.round((e.interval||1)*mult));
+    if(rating===4){e.ease=Math.min(3,e.ease+0.15);}
+    const daysMs=e.interval*24*60*60*1000;
+    e.due=Date.now()+daysMs;
+    known.add(k.k); learning.delete(k.k);
+  }
+  updateStats();
+  updateDeckFilterCounts();
+  saveSession();
+  srsCardIdx++;
+  showSRSCard();
+}
+
+/* ── DECK FILTER (study set) ────────────────────────────────── */
+let deckFilter='all';
+let customKanji=new Set();
+function setDeckFilter(f,btn){
+  deckFilter=f;
+  document.querySelectorAll('.deck-filter-row .filter-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('custom-panel').style.display=(f==='custom')?'block':'none';
+  if(f==='custom'){buildCustomPanel();return;}
+  applyDeckFilter();
+}
+function applyDeckFilter(){
+  let base=filterCat==='all'?[...KANJI]:KANJI.filter(k=>k.cat===filterCat);
+  if(deckFilter==='learning') deck=base.filter(k=>learning.has(k.k));
+  else if(deckFilter==='known') deck=base.filter(k=>known.has(k.k));
+  else if(deckFilter==='custom') deck=base.filter(k=>customKanji.has(k.k));
+  else deck=base;
+  idx=0; resetMode();
+}
+function updateDeckFilterCounts(){
+  const b=filterCat==='all'?KANJI:KANJI.filter(k=>k.cat===filterCat);
+  document.getElementById('ds-all').textContent='All ('+b.length+')';
+  document.getElementById('ds-learn').textContent='Still learning ('+b.filter(k=>learning.has(k.k)).length+')';
+  document.getElementById('ds-known').textContent='Got it ('+b.filter(k=>known.has(k.k)).length+')';
+}
+function buildCustomPanel(){
+  const grid=document.getElementById('csg');
+  grid.innerHTML='';
+  const base=filterCat==='all'?KANJI:KANJI.filter(k=>k.cat===filterCat);
+  base.forEach(k=>{
+    const t=document.createElement('div');
+    t.className='csg-tile'+(customKanji.has(k.k)?' selected':'')
+      +(known.has(k.k)?' status-known':learning.has(k.k)?' status-learning':'');
+    t.textContent=k.k;
+    t.title=k.mean;
+    t.onclick=()=>{
+      customKanji.has(k.k)?customKanji.delete(k.k):customKanji.add(k.k);
+      t.classList.toggle('selected');
+    };
+    grid.appendChild(t);
+  });
+}
+function applyCustom(){
+  document.getElementById('custom-panel').style.display='none';
+  applyDeckFilter();
+}
+
+/* ── CARD SLIDER ────────────────────────────────────────────── */
+function sliderNav(v){
+  idx=parseInt(v);
+  const card=document.getElementById('card');
+  card.classList.remove('flipped');
+  flipped=false;
+  document.getElementById('rate-btns').style.display='none';
+  showCard();
+}
+function syncSlider(){
+  const sl=document.getElementById('card-slider');
+  sl.max=Math.max(0,deck.length-1);
+  sl.value=idx;
+}
+
+/* ── KANJI MOSAIC (LIST MODE) ───────────────────────────────── */
+let listView='all';
+let listStatus='all';
+
+function setListView(v,btn){
+  listView=v;
+  document.querySelectorAll('#list-mode .filter-btn').forEach(b=>b.classList.remove('on'));
+  // re-activate correct status btn
+  const sBtn=document.getElementById('list-status-'+listStatus);
+  if(sBtn)sBtn.classList.add('on');
+  btn.classList.add('on');
+  renderMosaic();
+}
+function setListStatus(v,btn){
+  listStatus=v;
+  document.querySelectorAll('#list-mode .filter-btn').forEach(b=>b.classList.remove('on'));
+  const vBtn=document.getElementById('list-view-'+listView);
+  if(vBtn)vBtn.classList.add('on');
+  btn.classList.add('on');
+  renderMosaic();
+}
+
+// double-tap detection
+let lastTap={k:null,t:0};
+function handleTileTap(k){
+  const now=Date.now();
+  if(lastTap.k===k.k&&now-lastTap.t<400){
+    // double-tap: cycle neutral → learning → known → neutral
+    const kk=k.k;
+    if(known.has(kk)){known.delete(kk);learning.delete(kk);}
+    else if(learning.has(kk)){known.add(kk);learning.delete(kk);}
+    else{learning.add(kk);}
+    updateStats(); updateDeckFilterCounts(); saveSession();
+    renderMosaic();
+    lastTap={k:null,t:0};
+  } else {
+    lastTap={k:k.k,t:now};
+  }
+}
+
+function renderMosaic(){
+  const mosaic=document.getElementById('kanji-mosaic');
+  mosaic.innerHTML='';
+
+  let items=KANJI;
+  // category filter
+  if(listView!=='all') items=items.filter(k=>k.cat===listView);
+  // status filter
+  if(listStatus==='neutral') items=items.filter(k=>!known.has(k.k)&&!learning.has(k.k));
+  else if(listStatus==='learning') items=items.filter(k=>learning.has(k.k));
+  else if(listStatus==='known') items=items.filter(k=>known.has(k.k));
+
+  if(!items.length){
+    mosaic.innerHTML='<div style="font-size:13px;color:var(--txt3);padding:1rem">No kanji match the selected filters.</div>';
+    return;
+  }
+
+  items.forEach(k=>{
+    const tile=document.createElement('div');
+    const statusCls=known.has(k.k)?' status-known':learning.has(k.k)?' status-learning':'';
+    tile.className='km-tile'+statusCls;
+    tile.dataset.k=k.k;
+    tile.dataset.cat=k.cat;
+
+    let badge='';
+    if(known.has(k.k)) badge='<span class="km-badge b-known">Got it</span>';
+    else if(learning.has(k.k)) badge='<span class="km-badge b-learning">Learning</span>';
+
+    tile.innerHTML=
+      '<span class="km-k">'+k.k+'</span>'+
+      '<span class="km-mean">'+k.mean+'</span>'+
+      '<span class="km-read">ON: '+k.on+'<br>KUN: '+k.kun+'</span>'+
+      badge;
+
+    tile.addEventListener('click',()=>handleTileTap(k));
+    tile.addEventListener('touchend',e=>{e.preventDefault();handleTileTap(k);});
+
+    mosaic.appendChild(tile);
+  });
+}
+
+/* ── EXTEND setMode to handle new modes ────────────────────────── */
+const _origResetMode=resetMode;
+function resetMode(){
+  ['flash-mode','quiz-mode','match-mode','srs-mode','list-mode','result-screen']
+    .forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('hidden');});
+  const dfr=document.getElementById('deck-filter-row');
+  const cfr=document.getElementById('cat-filter-row');
+  const sw=document.getElementById('slider-wrap');
+  const pw=document.getElementById('progress-wrap');
+  // hide everything contextual first
+  if(dfr)dfr.style.display='none';
+  if(cfr)cfr.style.display='none';
+  if(sw)sw.style.display='none';
+  if(pw)pw.style.display='none';
+  if(mode==='flash'){
+    document.getElementById('flash-mode').classList.remove('hidden');
+    if(sw)sw.style.display='block';
+    if(pw)pw.style.display='block';
+    if(cfr)cfr.style.display='flex';
+    if(dfr)dfr.style.display='flex';
+    syncSlider(); showCard();
+  } else if(mode==='quiz'){
+    document.getElementById('quiz-mode').classList.remove('hidden');
+    if(dfr)dfr.style.display='flex';
+    document.getElementById('quiz-game').classList.add('hidden');
+    document.getElementById('quiz-start-hint').classList.remove('hidden');
+  } else if(mode==='match'){
+    document.getElementById('match-mode').classList.remove('hidden');
+    if(dfr)dfr.style.display='flex';
+    newMatchRound();
+  } else if(mode==='srs'){
+    document.getElementById('srs-mode').classList.remove('hidden');
+    if(dfr)dfr.style.display='flex';
+    startSRS();
+  } else if(mode==='list'){
+    document.getElementById('list-mode').classList.remove('hidden');
+    renderMosaic();
+  }
+  updateStats();
+}
+
+/* ── PATCH showCard to sync slider ─────────────────────────── */
+const _origShowCard=showCard;
+showCard=function(){
+  _origShowCard();
+  syncSlider();
+};
+
+/* ── PATCH rate() to save session ─────────────────────────── */
+const _origRate=rate;
+rate=function(gotIt){
+  _origRate(gotIt);
+  updateDeckFilterCounts();
+  saveSession();
+};
+
+/* ── SHUFFLE STATE ──────────────────────────────────────────── */
+let isShuffled=false;
+let originalDeck=[...deck];
+function toggleShuffle(){
+  const btn=document.getElementById('shuffle-btn');
+  if(isShuffled){
+    // restore original order
+    deck=[...originalDeck];
+    isShuffled=false;
+    btn.textContent='Shuffle';
+    btn.classList.remove('primary');
+  } else {
+    originalDeck=[...deck];
+    for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}
+    isShuffled=true;
+    btn.textContent='Unshuffled ↺';
+    btn.classList.add('primary');
+  }
+  idx=0; showCard(); syncSlider();
+}
+
+/* ── AUTH / LOGIN ────────────────────────────────────────────── */
+// Simple client-side auth using localStorage user store.
+// In production this would call a backend API.
+const USER_DB_KEY='n5kf_users';
+const SESSION_KEY='n5kf_session';
+let currentUser=null;
+
+function getUserDB(){try{return JSON.parse(localStorage.getItem(USER_DB_KEY)||'{}');}catch(e){return {};}}
+function saveUserDB(db){try{localStorage.setItem(USER_DB_KEY,JSON.stringify(db));}catch(e){}}
+function hashPass(p){// simple hash for demo — use bcrypt on a real backend
+  let h=0;for(let i=0;i<p.length;i++){h=(Math.imul(31,h)+p.charCodeAt(i))|0;}return h.toString(36);}
+
+function showLogin(){
+  document.getElementById('login-form').style.display='block';
+  document.getElementById('register-form').style.display='none';
+  document.getElementById('login-msg').textContent='';
+}
+function showRegister(){
+  document.getElementById('login-form').style.display='none';
+  document.getElementById('register-form').style.display='block';
+  document.getElementById('reg-msg').textContent='';
+}
+function doLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const pass=document.getElementById('login-pass').value;
+  const db=getUserDB();
+  const user=db[email];
+  if(!user){document.getElementById('login-msg').textContent='No account found. Create one first.';return;}
+  if(user.pass!==hashPass(pass)){document.getElementById('login-msg').textContent='Wrong password.';return;}
+  currentUser={email,name:user.name};
+  localStorage.setItem(SESSION_KEY,JSON.stringify(currentUser));
+  // load this user's kanji data
+  const uKey='n5kf_data_'+email;
+  try{
+    const d=JSON.parse(localStorage.getItem(uKey)||'{}');
+    if(d.known)known=new Set(d.known);
+    if(d.learning)learning=new Set(d.learning);
+    if(d.srsData)Object.entries(d.srsData).forEach(([k,v])=>srsData[k]=v);
+    if(d.customKanji)customKanji=new Set(d.customKanji);
+  }catch(e){}
+  closeLogin();
+}
+function doRegister(){
+  const name=document.getElementById('reg-name').value.trim();
+  const email=document.getElementById('reg-email').value.trim();
+  const pass=document.getElementById('reg-pass').value;
+  if(!name||!email||pass.length<6){document.getElementById('reg-msg').textContent='Please fill all fields (password ≥ 6 chars).';return;}
+  const db=getUserDB();
+  if(db[email]){document.getElementById('reg-msg').textContent='Email already registered.';return;}
+  db[email]={name,pass:hashPass(pass)};
+  saveUserDB(db);
+  document.getElementById('reg-msg').style.color='var(--txt-ok)';
+  document.getElementById('reg-msg').textContent='Account created! Signing in...';
+  setTimeout(()=>{
+    document.getElementById('login-email').value=email;
+    document.getElementById('login-pass').value=pass;
+    doLogin();
+  },800);
+}
+function continueGuest(){
+  currentUser=null;
+  localStorage.removeItem(SESSION_KEY);
+  closeLogin();
+}
+function doLogout(){
+  currentUser=null;
+  localStorage.removeItem(SESSION_KEY);
+  known=new Set();learning=new Set();
+  Object.keys(srsData).forEach(k=>delete srsData[k]);
+  updateStats();updateDeckFilterCounts();
+  document.getElementById('user-pill').style.display='none';
+  showLoginOverlay();
+}
+function closeLogin(){
+  document.getElementById('login-overlay').style.display='none';
+  if(currentUser){
+    const pill=document.getElementById('user-pill');
+    pill.style.display='flex';
+    document.getElementById('user-avatar').textContent=currentUser.name[0].toUpperCase();
+    document.getElementById('user-name-label').textContent=currentUser.name;
+  }
+  updateStats();updateDeckFilterCounts();
+}
+function showLoginOverlay(){
+  document.getElementById('login-overlay').style.display='flex';
+  showLogin();
+}
+
+/* patch saveSession to save per-user if logged in */
+const _origSave=saveSession;
+saveSession=function(){
+  _origSave();
+  if(currentUser){
+    const uKey='n5kf_data_'+currentUser.email;
+    try{localStorage.setItem(uKey,JSON.stringify({
+      known:[...known],learning:[...learning],
+      srsData:Object.fromEntries(Object.entries(srsData).map(([k,v])=>[k,v])),
+      customKanji:[...customKanji],
+    }));}catch(e){}
+  }
+};
+
+/* ── INIT ───────────────────────────────────────────────────── */
+document.querySelectorAll('#quiz-type-checklist input').forEach(c=>{
+  c.addEventListener('change', updateStartBtn);
+});
+updateStartBtn();
+// check for existing session
+try{
+  const sess=JSON.parse(localStorage.getItem(SESSION_KEY)||'null');
+  if(sess&&sess.email){
+    currentUser=sess;
+    const uKey='n5kf_data_'+sess.email;
+    const d=JSON.parse(localStorage.getItem(uKey)||'{}');
+    if(d.known)known=new Set(d.known);
+    if(d.learning)learning=new Set(d.learning);
+    if(d.srsData)Object.entries(d.srsData).forEach(([k,v])=>srsData[k]=v);
+    if(d.customKanji)customKanji=new Set(d.customKanji);
+    closeLogin();
+  } else {
+    loadSession(); // guest: load from shared key
+    showLoginOverlay();
+  }
+}catch(e){loadSession();showLoginOverlay();}
+updateDeckFilterCounts();
+showCard();
+syncSlider();
+updateStats();
+
+/* ── SERVICE WORKER REGISTRATION ─────────────────────────── */
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').then(reg=>{
+    console.log('SW registered:', reg.scope);
+  }).catch(err=>{
+    console.log('SW registration skipped (open as file):', err.message);
+  });
+}
+</script>
+</body>
+</html>
